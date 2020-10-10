@@ -3,7 +3,7 @@
 ## Conectare
 **Mod de lucru:** serverul de la facultate
 
-![](images/conectare_sqlPlus.jpg)
+![](images/conectare_sqlPlus.jpg?style=centerme)
 
 ## Exercitii
 
@@ -22,9 +22,9 @@ A. Care sunt declaratiile invalide ?
 
 ---
 
- B. Care este rezultatul afişat de programul următor?
+B. Care este rezultatul afişat de programul următor?
  
-![](images/PL1_sql_B.jpg)
+![](images/PL1_sql_B.jpg?style=centerme)
 
 Rezultat: Numele urilizatorului curent
 
@@ -34,7 +34,7 @@ Rezultat: Numele urilizatorului curent
  
 C. Creaţi un bloc PL/SQL în care declaraţi variabilele de la secţiunea A, punctele 1,6,8. Afişaţi informaţiile stocate în aceste variabile.
 
-~~~sql
+```sql
 DECLARE
 nom_varA NUMBER(8) DEFAULT 10; 
 nom_varI NUMBER(3) :=123.45678; 
@@ -45,10 +45,10 @@ dbms_output.put_line ('nom_varI = ' || nom_varI);
 dbms_output.put_line ('nom_varK = ' || nom_varK);
 END;
 /
-~~~
+```
 
 **Rezultat**
-```bash
+```sql
 nom_varA = 10
 nom_varI = 123
 nom_varK = 123.457
@@ -65,6 +65,7 @@ begin
 end ;
 /
 ```
+
 | SQL | Rezultat |
 |--|--|
 | `SELECT * INTO v_1 FROM emp WHERE empno= 7900 ;` | valid - scoate din baza de date o inregistrare pe care o pune in v_1 |
@@ -94,7 +95,6 @@ END;
 ```
 
 **Rezultat:**
-
 ```sql
 Cel mai mare salariu este: 2850
 ```
@@ -141,7 +141,8 @@ Dupa executie, afisati tabela.
 ```sql
 SELECT * FROM emp;
 ```
-![](images/PL1_sql_G_initial.jpg)
+
+![](images/PL1_sql_G_initial.jpg?style=centerme)
 
 ```sql
 ACCEPT empcod PROMPT 'Introduceti codul angajatului '
@@ -168,7 +169,8 @@ ROLLBACK;
 ```
 
 Rezultate (pentru 411 si Razvan):
-![](images/PL1_sql_G_rezultat.jpg)
+
+![](images/PL1_sql_G_rezultat.jpg?style=centerme)
 
 ---
 
@@ -384,6 +386,7 @@ salariu bun
 ---
 
 N. Creati un bloc PL/SQL care calculeaza suma primelor 100 numere intregi. (utilizati o bucla *cat timp*)
+
 ```sql
 DECLARE
     i number(3) := 1;
@@ -406,6 +409,7 @@ Suma primelor 100 numere este 5050
 ---
 
 O. Creati un bloc PL/SQL care calculeaza suma primelor 100 numere intregi. (utilizati o bucla *pana cand*)
+
 ```sql
 DECLARE
     i number(3) := 1;
@@ -429,6 +433,7 @@ Suma primelor 100 numere este 5050
 ---
 
 P. Creati un bloc PL/SQL care permite inserarea in tabela dept a cinci departamente noi, cu nume la alegere sau generate, si avand coduri secventiale, din 10 in 10, dupa ultimul existent.
+
 ```sql
 DECLARE
   numar_dept dept.deptno%TYPE;
