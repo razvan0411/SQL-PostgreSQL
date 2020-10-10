@@ -3,7 +3,7 @@
 ## Conectare
 **Mod de lucru:** serverul de la facultate
 
-![](images/conectare_sqlPlus.jpg?style=centerme)
+![](images/conectare_sqlPlus.jpg)
 
 ## Exercitii
 
@@ -24,7 +24,7 @@ A. Care sunt declaratiile invalide ?
 
 B. Care este rezultatul afişat de programul următor?
  
-![](images/PL1_sql_B.jpg?style=centerme)
+![](images/PL1_sql_B.jpg)
 
 Rezultat: Numele urilizatorului curent
 
@@ -142,7 +142,7 @@ Dupa executie, afisati tabela.
 SELECT * FROM emp;
 ```
 
-![](images/PL1_sql_G_initial.jpg?style=centerme)
+![](images/PL1_sql_G_initial.jpg)
 
 ```sql
 ACCEPT empcod PROMPT 'Introduceti codul angajatului '
@@ -170,7 +170,7 @@ ROLLBACK;
 
 Rezultate (pentru 411 si Razvan):
 
-![](images/PL1_sql_G_rezultat.jpg?style=centerme)
+![](images/PL1_sql_G_rezultat.jpg)
 
 ---
 
