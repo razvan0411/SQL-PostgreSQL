@@ -23,6 +23,7 @@ A. Care sunt declaratiile invalide ?
 ---
 
  B. Care este rezultatul afişat de programul următor?
+ 
 ![](images/PL1_sql_B.jpg)
 
 Rezultat: Numele urilizatorului curent
