@@ -494,9 +494,9 @@ BEGIN
 	CASE
 		WHEN salariu_angajat >= salariu_mediu*3 THEN
 			dbms_output.put_line('Salariul lui ' || nume_salariat || ' este cel putin de 3 ori salariului mediu');
-		WHEN salariu_angajat BETWEEN salariu_mediu*2 AND salariu_mediu*3 THEN
+		WHEN salariu_angajat BETWEEN salariu_mediu*2 AND salariu_mediu*3-1 THEN
 			dbms_output.put_line('Salariul lui ' || nume_salariat || ' este cel putin dublul salariului mediu');
-		WHEN salariu_angajat BETWEEN salariu_mediu AND salariu_mediu*2 THEN
+		WHEN salariu_angajat BETWEEN salariu_mediu AND salariu_mediu*2-1 THEN
 			dbms_output.put_line('Salariul lui ' || nume_salariat || ' nu este mai mult ca dublul salariului mediu');
 		ELSE 
 			dbms_output.put_line('Salariul lui ' || nume_salariat || ' este mai mic decat salariul mediu');
