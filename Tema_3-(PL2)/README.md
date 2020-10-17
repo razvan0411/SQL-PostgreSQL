@@ -103,8 +103,42 @@ Departamentul ACCOUNTING are 3 si salatiul mediu de 2916.67 EURO.
 
 ---
 
+C. Creaţi un bloc PL/SQL care utilizează un cursor parametrizat pentru afişarea, mai întâi, a şirului iniţialelor angajaţilor departamentului 10, iar apoi şirul cu ultimele litere ale angajaţilor departamentului 20. 
+
+
+```sql 
+DECLARE
+    CURSOR c (parametru number) IS
+    SELECT ename FROM emp where deptno=parametru;
+BEGIN
+    Dbms_output.put_line('Departament 10:');
+    FOR v_ename IN c(10) LOOP
+        Dbms_output.put_line(substr(v_ename.ename,1,1));
+    END LOOP;
+    Dbms_output.put_line('Departament20:');
+    FOR v_ename IN c(20) LOOP
+        Dbms_output.put_line(substr(v_ename.ename,-1,1));
+    END LOOP;
+END;
+/
+```
+
+Rezultat:
+```sql
+Departament 10:
+K
+C
+M
+Departament20:
+S
 D
-Creaţi o tabelă de comentarii (două coloane: nume şi observatii) unde înregistraţi, cu ajutorul unui bloc PL/SQL, comentarii la salariul fiecărui angajat, faţă de salariul mediu al departamentului lui, de exemplu :
+H
+T
+S
+```
+
+---
+D. Creaţi o tabelă de comentarii (două coloane: nume şi observatii) unde înregistraţi, cu ajutorul unui bloc PL/SQL, comentarii la salariul fiecărui angajat, faţă de salariul mediu al departamentului lui, de exemplu :
 - salariul lui X este cel putin dublul salariului mediu
 - salariul lui X este cel putin de 3 ori salariul mediu
 - salariul lui X nu este mai mult ca dublul salariului mediu
