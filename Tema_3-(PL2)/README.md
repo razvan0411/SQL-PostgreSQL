@@ -179,8 +179,9 @@ E. Creaţi un bloc PL/SQL care:
     - INVALID_NUMBER
     - precum şi ultima alternativă, pentru toate celelalte erori.
    
-Prin execuţii repetate, cu diferite valori, faceţi să se declanşeze secvenţele de tratare a excepţiilor. 
+Prin execuţii repetate, cu diferite valori, faceţi să se declanşeze secvenţele de tratare a excepţiilor.
 
+Continutul fisierului _**ex_e.sql**_
 ```sql
 ACCEPT cod_client PROMPT 'Introduceti codul clientului ';
 ACCEPT cod_produs PROMPT 'Introduceti codul produsului ';
@@ -210,10 +211,10 @@ Rezultat:
 
 ---
 
-G
-Creaţi un bloc PL/SQL pentru modificarea unui pret pentru un produs (indicat prin denumire). Controlaţi că noul pret nu este superior celui vechi; dacă da, atunci declanşaţi o excepţie.
+G. Creaţi un bloc PL/SQL pentru modificarea unui pret pentru un produs (indicat prin denumire). Controlaţi că noul pret nu este superior celui vechi; dacă da, atunci declanşaţi o excepţie.
 În acelaşi timp, prevedeţi secvenţe pentru tratarea altor excepţii: produsul nu exista (NO_DATA_FOUND), există mai multe produse cu aceeaşi denumire (TOO_MANY_ROWS).
 
+Continutul fisierului _**ex_g.sql**_
 ```sql 
 ACCEPT den_prod PROMPT 'Introduceti denumirea produsului ';
 ACCEPT pret_nou PROMPT 'Introduceti noul pret ';
