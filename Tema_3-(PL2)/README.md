@@ -12,6 +12,7 @@ SQL> set line 300
 ```
 
 `set serveroutput on` indica sistemului sa sa afiseze rezultatele pe ecran
+
 `set line 300` indica cate caractere se pot afisa pe o linie
 ## Exercitii
 
