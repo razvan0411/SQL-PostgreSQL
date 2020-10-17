@@ -1,518 +1,320 @@
-# Laborator PL/SQL 1
+# Laborator PL/SQL 2
 
 ## Conectare
 **Mod de lucru:** serverul de la facultate
 
 ![](images/conectare_sqlPlus.jpg)
 
+## Setări inițiale
+```sql
+SQL> set serveroutput on
+SQL> set line 300
+```
+
+`set serveroutput on` indica sistemului sa sa afiseze rezultatele pe ecran
+`set line 300` indica cate caractere se pot afisa pe o linie
 ## Exercitii
 
-A. Care sunt declaratiile invalide ?
-
-| interogare | rezultat |
-|--|--|
-| `nom_varA NUMBER(8) DEFAULT 10 ;` | valid |
-| `nom_var VARCHAR2(20) NOT NULL ;` | invalid pt ca e declaratie e not null dar variabila nu e initializata |
-| `nom_var BOOLEAN :=1 ;` | invalid pt ca booleanul are valori true sau false |
-| `nom_var BINARY_INTEGER ;` | valid |
-| `2nom_var BINARY_INTEGER ;` | invalid, numele de variabile nu incep cu cifre |
-| `nom_varI NUMBER(3) :=123.45678 ;` | valid |
-| `nom_var NUMBER(3) :=1234.5678 ;` | invalid, valoare nu poate fi memorata, number este declarat de 3 cifre |
-| `nom_varK CONSTANT NUMBER(12,3) :=123.45678 ;` |  valid, numarul se rotunjeste |
-
----
-
-B. Care este rezultatul afişat de programul următor?
- 
-![](images/PL1_sql_B.jpg)
-
-Rezultat: Numele urilizatorului curent
-
-**ATENTIE:** trebuie executata comanda `set serveroutput on` pentru ca blocul sa poata afisa pe ecran
-
----
- 
-C. Creaţi un bloc PL/SQL în care declaraţi variabilele de la secţiunea A, punctele 1,6,8. Afişaţi informaţiile stocate în aceste variabile.
+A. Creaţi un bloc PL/SQL care afişează un calificativ pentru salariul fiecărui angajat (foarte bun, bun, destul de bun, deloc bun) după valoarea salariului înregistrat în tabelă.
 
 ```sql
 DECLARE
-nom_varA NUMBER(8) DEFAULT 10; 
-nom_varI NUMBER(3) :=123.45678; 
-nom_varK CONSTANT NUMBER(12,3) :=123.45678;
-BEGIN
-dbms_output.put_line ('nom_varA = ' || nom_varA);
-dbms_output.put_line ('nom_varI = ' || nom_varI);
-dbms_output.put_line ('nom_varK = ' || nom_varK);
-END;
-/
-```
-
-**Rezultat**
-```sql
-nom_varA = 10
-nom_varI = 123
-nom_varK = 123.457
-```
-
----
-
-D. Care sunt expresiile valide care pot înlocui trei puncte din blocul următor?
-```sql
-declare
- v_1 emp%ROWTYPE ;
-begin
-…
-end ;
-/
-```
-
-| SQL | Rezultat |
-|--|--|
-| `SELECT * INTO v_1 FROM emp WHERE empno= 7900 ;` | valid - scoate din baza de date o inregistrare pe care o pune in v_1 |
-| `UPDATE emp SET ROW=v_1 WHERE empno= 7900;` | invalid - in variabila v_1 nu exista date care sa poata fi introduce (mai ales ca empno are constrangeri de not null) |
-| `SELECT COUNT(*) INTO v_1 FROM emp WHERE 1=2 ;` | invalid - v_1 este de tipul unui rand din tabela emp, nu poate stoca un numar returnat de count |
-| `SELECT * INTO v_1 FROM emp WHERE 1=2 ;` | invalid - variavila v_1 trebuie sa contina o inregistrare |
-| `SELECT * INTO v_1 FROM emp ;` | invalid - variabila v_1 nu poate stoca mai mult de o inregistrare, iar subinterogarea returneaza toate randurile din emp  |
-
----
-
-E. Creati blocul PL/SQL care afiseaza cel mai mare salariu a departamentului SALES, utilizând o variabila de legatura.
-
-```sql
-DECLARE
-sal_max emp.sal%TYPE;
-BEGIN
-    SELECT MAX(sal) INTO sal_max 
-    FROM emp 
-    WHERE deptno = (
-                        SELECT deptno  
-                        FROM dept
-                        WHERE dname='SALES'
-                    );
-    dbms_output.put_line('Cel mai mare salariu este: ' || sal_max);
-END;
-/
-```
-
-**Rezultat:**
-```sql
-Cel mai mare salariu este: 2850
-```
-
----
-
-F. Creati blocul PL/SQL care preia de la tastatura un nume de departament si returneaza un mesaj ce indica numarul de angajati la acest departament.
-
-```sql
-ACCEPT deptname PROMPT 'Introduceti numele departamentui '
-DECLARE 
-nume_dept dept.dname%type;
-total number(2);
-BEGIN
-    nume_dept :='&deptname';
-    SELECT COUNT(*) INTO total 
-    FROM emp 
-    WHERE deptno=(
-                    SELECT deptno 
-                    FROM dept 
-                    WHERE dname = UPPER(nume_dept)
-                );
-    dbms_output.put_line('Numarul total de angajati din departamentul ' || UPPER(nume_dept) || ' este ' || total || '.';
-END;
-/
-```
-
-Rezultatul (in cazul departamentului Sales):
-```sql
-Numarul total de angajati din departamentul SALES este 6.
-```
-
----
-
-G. Creati blocul PL/SQL care permite inserarea unui nou angajat: 
-- utilizati variabile de substitutie pentru parametrizarea blocului PL/SQL, pentru numele si codul angajatului ;
-- pentru salariu, utilizati rezultatul de la sectiunea E, dublat; 
-- celelalte coloane ramân nule.
-
-Confirmati (validati actualizarile).
-
-Dupa executie, afisati tabela.
-
-```sql
-SELECT * FROM emp;
-```
-
-![](images/PL1_sql_G_initial.jpg)
-
-```sql
-ACCEPT empcod PROMPT 'Introduceti codul angajatului '
-ACCEPT empname PROMPT 'Introduceti numele angajatului '
-DECLARE 
-cod_emp emp.empno%type;
-nume_emp emp.ename%type;
-salariu emp.sal%type;
-BEGIN
-    cod_emp := &empcod;
-    nume_emp := '&empname';
-    SELECT MAX(sal) INTO salariu 
-    FROM emp 
-    WHERE deptno = (
-                        SELECT deptno  
-                        FROM dept
-                        WHERE dname='SALES'
-                    );
-    INSERT INTO emp(empno, ename, sal, deptno) VALUES(cod_emp, nume_emp, salariu*2, 10);
-END;
-/
-SELECT * FROM emp;
-ROLLBACK;
-```
-
-Rezultate (pentru 411 si Razvan):
-
-![](images/PL1_sql_G_rezultat.jpg)
-
----
-
-H. Creati blocul PL/SQL care permite modificarea locatiei unui departament :
-- utilizati variabilele de substitutie pentru a parametriza blocul PL/SQL, pentru numele departamentului si noua locatie. 
-Confirmati (validati) actualizarile.
-Dupa executie, afisati tabela.
-
-```sql
-ACCEPT nume_departament PROMPT 'Introduceti numele departamentului '
-ACCEPT loc_nou PROMPT 'Introduceti noua locatie '
-DECLARE 
-loc_dept dept.loc%type;
-nume_dept dept.dname%type;
-BEGIN
-    nume_dept := '&nume_departament';
-    loc_dept := '&loc_nou';
-    UPDATE dept
-    SET loc = loc_dept
-    WHERE dname = nume_dept;
-END;
-/
-
-SELECT * FROM DEPT;
-ROLLBACK;
-```
-
-Rezultat (pentru SALES si Bucuresti):
-```sql
-    DEPTNO DNAME          LOC
----------- -------------- -------------
-        10 ACCOUNTING     NEW YORK
-        20 RESEARCH       DALLAS
-        30 SALES          Bucuresti
-        40 OPERATIONS     BOSTON
-```
-
----
-
-I. Creati blocul PL/SQL care permite stergerea angajatilor unui anumit departament, a carui
-nume este introdus de la tastatura printr-o variabila de substitutie. Afisati numarul de linii afectate (SQL%ROWCOUNT).
-Dupa executie, afisati tabela.
-
-```sql
-ACCEPT nume_departament PROMPT 'Introduceti numele departamentului '
-DECLARE 
-numar_delete number(3) DEFAULT 0;
-nume_dept dept.dname%type;
-BEGIN
-    nume_dept := '&nume_departament';
-    DELETE FROM emp
-    WHERE deptno = (
-                        SELECT deptno
-                        FROM dept
-                        WHERE dname=nume_dept
-                    );
-    numar_delete := SQL%ROWCOUNT;
-    dbms_output.put_line('Numarul de angajati stersi este ' || numar_delete);
-END;
-/
-
-SELECT * FROM emp;
-ROLLBACK;
-```
-
-Rezultat (pentru SALES):
-```sql
-Numarul de angajati stersi este 6
-
-     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
----------- ---------- --------- ---------- --------- ---------- ---------- ----------
-      7839 KING       PRESIDENT            17-NOV-81       5000                    10
-      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
-      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
-      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
-      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
-      7788 SCOTT      ANALYST         7566 09-DEC-82       3000                    20
-      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
-      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
-```
-
----
-
-J. Creati un bloc PL/SQL care gaseste in doi pasi numele departamentului in care lucreaza un angajat: mai intai cauta in tabela emp un angajat dupa nume (introdus la tastatura), iar apoi cauta numele departamentului in tabela dept.
-
-```sql
-ACCEPT nume_angajat PROMPT 'Introduceti numele angajatului '
-DECLARE
-nume_emp emp.ename%type;
-nr_dept emp.deptno%type;
-nume_dept dept.dname%type;
-BEGIN
-    nume_emp := '&nume_angajat';
-    SELECT deptno INTO nr_dept
-    FROM emp
-    WHERE ename = nume_emp;
-    SELECT dname INTO nume_dept
-    FROM dept
-    WHERE deptno = nr_dept;
-    dbms_output.put_line('Numele departamentului la care lucreaza ' || nume_emp || ' este ' || nume_dept);
-END;
-/
-```
-
-Rezultat (pentru ADAMS):
-```sql
-Numele departamentului la care lucreaza ADAMS este RESEARCH
-```
-
----
-
-K. Creati un alt bloc PL/SQL care face acelasi lucru, intr-un singur pas.
-```sql
-DECLARE
-    nume_emp emp.ename%type;
-    nume_dept dept.dname%TYPE;
-BEGIN
-    nume_emp := '&nume_angajat';
-    SELECT dname INTO nume_dept
-    FROM dept
-    WHERE deptno = (
-                        SELECT deptno 
-                        FROM emp 
-                        Where ename = nume_emp);
-    dbms_output.put_line('Numele departamentului la care lucreaza ' || nume_emp || ' este ' || nume_dept);
-END;
-/
-```
-
-Rezultat (pentru ADAMS):
-```sql
-Numele departamentului la care lucreaza ADAMS este RESEARCH
-```
-
----
-
-L. Creati un bloc PL/SQL care cauta un angajat in tabela emp dupa numele sau (introdus la tastatura) si care ii modifica jobul in ‘EXPERT’ daca salariul este mai mare decat 2800.
-
-```sql
-ACCEPT nume_angajat PROMPT 'Introduceti numele angajatului '
-DECLARE
-    cod_emp emp.empno%TYPE;
+    nume emp.ename%TYPE;
     salariu emp.sal%TYPE;
-    nume_emp emp.ename%type;
+    CURSOR c2 IS
+        SELECT ename, sal
+        FROM emp;
 BEGIN
-    nume_emp := '&nume_angajat';
-    SELECT empno, sal INTO cod_emp, salariu
-    FROM emp
-    WHERE ename = nume_emp;
-    IF salariu > 2800 THEN
-        UPDATE emp SET job='EXPERT' WHERE empno = cod_emp;
-    END IF;
-END;
-/
-SELECT * FROM emp;
-ROLLBACK;
-``` 
-
-Rezultat (pentru SCOTT):
-```sql
-     EMPNO ENAME      JOB              MGR HIREDATE         SAL       COMM     DEPTNO
----------- ---------- --------- ---------- --------- ---------- ---------- ----------
-      7839 KING       PRESIDENT            17-NOV-81       5000                    10
-      7698 BLAKE      MANAGER         7839 01-MAY-81       2850                    30
-      7782 CLARK      MANAGER         7839 09-JUN-81       2450                    10
-      7566 JONES      MANAGER         7839 02-APR-81       2975                    20
-      7654 MARTIN     SALESMAN        7698 28-SEP-81       1250       1400         30
-      7499 ALLEN      SALESMAN        7698 20-FEB-81       1600        300         30
-      7844 TURNER     SALESMAN        7698 08-SEP-81       1500          0         30
-      7900 JAMES      CLERK           7698 03-DEC-81        950                    30
-      7521 WARD       SALESMAN        7698 22-FEB-81       1250        500         30
-      7902 FORD       ANALYST         7566 03-DEC-81       3000                    20
-      7369 SMITH      CLERK           7902 17-DEC-80        800                    20
-      7788 SCOTT      EXPERT          7566 09-DEC-82       3000                    20
-      7876 ADAMS      CLERK           7788 12-JAN-83       1100                    20
-      7934 MILLER     CLERK           7782 23-JAN-82       1300                    10
-```
-
----
-
-M. Creati un bloc PL/SQL care cauta un angajat in tabela emp dupa numele sau (introdus la tastatura) si care afiseaza un calificativ pentru salariul sau (*foarte bun*, *bun*, *destul de bun*, *deloc bun*) in functie de salariul inregistrat in tabela. 
-
-```sql
-ACCEPT nume_angajat PROMPT 'Introduceti numele angajatului '
-DECLARE
-    nume_emp emp.ename%type;
-    cod_emp emp.empno%TYPE;
-    salariu emp.sal%TYPE;
-BEGIN
-    nume_emp := '&nume_angajat';
-    SELECT sal INTO salariu
-    FROM emp
-    WHERE ename = nume_emp;
-    CASE 
-        WHEN salariu < 1000 THEN
-            dbms_output.put_line('salariu deloc bun');
-        WHEN salariu BETWEEN 1000 AND 2000 THEN
-            dbms_output.put_line('salariu destul de bun');
-        WHEN salariu BETWEEN 2000 AND 3000 THEN
-            dbms_output.put_line('salariu bun');
-        ELSE
-            dbms_output.put_line('salariu foarte bun');
-    END CASE;
-END;
-/
-```
-
-Rezultat (pentru SCOTT):
-```sql
-salariu bun
-```
-
----
-
-N. Creati un bloc PL/SQL care calculeaza suma primelor 100 numere intregi. (utilizati o bucla *cat timp*)
-
-```sql
-DECLARE
-    i number(3) := 1;
-    suma number(4) := 0;
-BEGIN
-    WHILE i <= 100 LOOP
-        suma := suma + i;
-        i := i + 1;
-    END LOOP;
-    dbms_output.put_line('Suma primelor ' || (i-1) || ' numere este ' || suma);
-END;
-/
-```
-
-Rezultat:
-```sql
-Suma primelor 100 numere este 5050
-```
-
----
-
-O. Creati un bloc PL/SQL care calculeaza suma primelor 100 numere intregi. (utilizati o bucla *pana cand*)
-
-```sql
-DECLARE
-    i number(3) := 1;
-    suma number(4) := 0;
-BEGIN
+    OPEN c2;
     LOOP
-        suma := suma + i;
-        i := i + 1;
-        EXIT WHEN i > 100;
+        FETCH c2 INTO nume, salariu;
+        EXIT WHEN c2%NOTFOUND;
+        CASE 
+            WHEN salariu < 1000 THEN
+                dbms_output.put_line(nume || ' are un salariu deloc bun');
+            WHEN salariu BETWEEN 1000 AND 2000 THEN
+                dbms_output.put_line(nume || ' are salariu destul de bun');
+            WHEN salariu BETWEEN 2000 AND 3000 THEN
+                dbms_output.put_line(nume || ' are salariu bun');
+            ELSE
+                dbms_output.put_line(nume || ' are salariu foarte bun');
+         END CASE;
     END LOOP;
-    dbms_output.put_line('Suma primelor ' || (i-1) || ' numere este ' || suma);
+    CLOSE c2;
 END;
 /
 ```
 
 Rezultat:
 ```sql
-Suma primelor 100 numere este 5050
+KING are salariu foarte bun
+BLAKE are salariu bun
+CLARK are salariu bun
+JONES are salariu bun
+MARTIN are salariu destul de bun
+ALLEN are salariu destul de bun
+TURNER are salariu destul de bun
+JAMES are un salariu deloc bun
+WARD are salariu destul de bun
+FORD are salariu bun
+SMITH are un salariu deloc bun
+SCOTT are salariu bun
+ADAMS are salariu destul de bun
+MILLER are salariu destul de bun
 ```
 
 ---
 
-P. Creati un bloc PL/SQL care permite inserarea in tabela dept a cinci departamente noi, cu nume la alegere sau generate, si avand coduri secventiale, din 10 in 10, dupa ultimul existent.
+B. Calculaţi şi afişaţi salariul mediu şi numărul de angajaţi pentru fiecare departament.
 
 ```sql
 DECLARE
-  numar_dept dept.deptno%TYPE;
+    departament emp.deptno%TYPE;
+    numar_angajati NUMBER;
+    salariu_mediu number(10,2);
+    dept_nume dept.dname%type;
+    CURSOR c3 IS
+        SELECT  deptno, COUNT(*), AVG(sal)
+        FROM emp
+        GROUP BY deptno;
 BEGIN
-   SELECT MAX(deptno) INTO numar_dept
-   FROM dept;
-   FOR i IN 1..5
-   LOOP
-        numar_dept := numar_dept+10;
-        INSERT INTO dept(deptno, dname, loc) VALUES (numar_dept, 'nume_dept'||i, 'GALATI') ;
+    OPEN c3;
+    LOOP
+        FETCH c3 INTO departament, numar_angajati, salariu_mediu;
+        EXIT WHEN c3%NOTFOUND;
+        SELECT dname INTO dept_nume
+        FROM dept
+        WHERE deptno = departament;
+        dbms_output.put_line('Departamentul ' || dept_nume || ' are '|| numar_angajati || ' si salatiul mediu de ' || salariu_mediu || ' EURO.');
     END LOOP;
+    CLOSE c3;
 END;
 /
-
-SELECT * FROM dept;
-ROLLBACK;
-``` 
+```
 
 Rezultat:
-```sql
-    DEPTNO DNAME          LOC
----------- -------------- -------------
-        10 ACCOUNTING     NEW YORK
-        20 RESEARCH       DALLAS
-        30 SALES          CHICAGO
-        40 OPERATIONS     BOSTON
-        50 nume_dept1     GALATI
-        60 nume_dept2     GALATI
-        70 nume_dept3     GALATI
-        80 nume_dept4     GALATI
-        90 nume_dept5     GALATI
+```sql 
+Departamentul SALES are 6 si salatiul mediu de 1566.67 EURO.
+Departamentul RESEARCH are 5 si salatiul mediu de 2175 EURO.
+Departamentul ACCOUNTING are 3 si salatiul mediu de 2916.67 EURO.
 ```
+
+![](images/PL2_sql_B.jpg)
 
 ---
 
-Q. Creaţi un bloc PL/SQL care apreciaza salariul unui angajat (cu numele introdus de la tastatura), faţă de salariul mediu al departamentului lui, prin una din exprimarile urmatoare:
-- *salariul lui X este cel putin dublul salariului mediu*
-- *salariul lui X este cel putin de 3 ori salariul mediu*
-- *salariul lui X nu este mai mult ca dublul salariului mediu*
-- *salariul lui X este mai mic decat salariul mediu.*
+D
+Creaţi o tabelă de comentarii (două coloane: nume şi observatii) unde înregistraţi, cu ajutorul unui bloc PL/SQL, comentarii la salariul fiecărui angajat, faţă de salariul mediu al departamentului lui, de exemplu :
+- salariul lui X este cel putin dublul salariului mediu
+- salariul lui X este cel putin de 3 ori salariul mediu
+- salariul lui X nu este mai mult ca dublul salariului mediu
+- salariul lui X este mai mic decat salariul mediu 
 
-```sql
-ACCEPT nume_angajat PROMPT 'Introduceti numele angajatului '
+```sql 
+CREATE TABLE EMP_COMENTARII 
+(
+  NUME VARCHAR2(20),
+  COMENTARIU VARCHAR2(200) 
+);
+
 DECLARE
-	salariu_mediu emp.sal%type;
-	cod_departament dept.deptno%type;
-	salariu_angajat emp.sal%type;
-	nume_salariat emp.ename%type;
+    sal_mediu emp.sal%TYPE;
+    CURSOR c7(nr_dep number) IS
+        SELECT AVG(sal)
+        FROM emp
+        WHERE deptno = nr_dep;
 BEGIN
-	nume_salariat := '&nume_angajat';
-	
-	SELECT deptno, sal INTO cod_departament, salariu_angajat
-	FROM emp
-	WHERE ename LIKE nume_salariat;
-	
-	SELECT AVG(sal) INTO salariu_mediu
-	FROM emp
-	WHERE deptno = cod_departament;
-	
-	dbms_output.put_line('Salariul mediu al departamentului lui ' || nume_salariat || ' este ' || salariu_mediu);
-	dbms_output.put_line('Salariul lui ' || nume_salariat || ' este ' || salariu_angajat);
-	
-	CASE
-		WHEN salariu_angajat >= salariu_mediu*3 THEN
-			dbms_output.put_line('Salariul lui ' || nume_salariat || ' este cel putin de 3 ori salariului mediu');
-		WHEN salariu_angajat BETWEEN salariu_mediu*2 AND salariu_mediu*3-1 THEN
-			dbms_output.put_line('Salariul lui ' || nume_salariat || ' este cel putin dublul salariului mediu');
-		WHEN salariu_angajat BETWEEN salariu_mediu AND salariu_mediu*2-1 THEN
-			dbms_output.put_line('Salariul lui ' || nume_salariat || ' nu este mai mult ca dublul salariului mediu');
-		ELSE 
-			dbms_output.put_line('Salariul lui ' || nume_salariat || ' este mai mic decat salariul mediu');
-	END CASE;
+    FOR var IN (SELECT ename, sal, deptno FROM emp) LOOP
+        OPEN c7(var.deptno);
+        FETCH c7 INTO sal_mediu;
+        CLOSE c7;
+        IF( var.sal < sal_mediu) THEN
+            INSERT INTO emp_comentarii VALUES (var.ename, 'este mai mic decat salariul mediu');
+        ELSE IF( var.sal < sal_mediu * 2 ) THEN
+                INSERT INTO emp_comentarii VALUES (var.ename, 'nu este mai mult ca dublul salariului mediu');
+            ELSE IF( var.sal < sal_mediu * 3) THEN
+                    INSERT INTO emp_comentarii VALUES (var.ename, 'este cel putin dublul salariului mediu');
+                ELSE
+                    INSERT INTO emp_comentarii VALUES (var.ename, 'este cel putin de 3 ori salariul mediu');
+                END IF;
+            END IF;
+        END IF;
+    END LOOP;
 END;
 /
 ```
 
 Rezultat:
-```sql
-Salariul mediu al departamentului lui SCOTT este 2175
-Salariul lui SCOTT este 3000
+```sql 
+SQL> SELECT 'Salariul lui ' || nume || ' ' || comentariu AS COMENTARII FROM emp_comentarii;
+
+COMENTARII
+----------------------------------------------------------------------
+Salariul lui KING nu este mai mult ca dublul salariului mediu
+Salariul lui BLAKE nu este mai mult ca dublul salariului mediu
+Salariul lui CLARK este mai mic decat salariul mediu
+Salariul lui JONES nu este mai mult ca dublul salariului mediu
+Salariul lui MARTIN este mai mic decat salariul mediu
+Salariul lui ALLEN nu este mai mult ca dublul salariului mediu
+Salariul lui TURNER este mai mic decat salariul mediu
+Salariul lui JAMES este mai mic decat salariul mediu
+Salariul lui WARD este mai mic decat salariul mediu
+Salariul lui FORD nu este mai mult ca dublul salariului mediu
+Salariul lui SMITH este mai mic decat salariul mediu
 Salariul lui SCOTT nu este mai mult ca dublul salariului mediu
+Salariul lui ADAMS este mai mic decat salariul mediu
+Salariul lui MILLER este mai mic decat salariul mediu
+
+14 rows selected.
+```
+
+---
+
+E. Creaţi un bloc PL/SQL care:
+1. citeşte două valori introduse la tastatură reprezentând codul unui client (corespunzator tabelei CLIENT) şi codul unui produs (corespunzator tabelei PROD),
+2. afişează cantitatea din acel produs cumparat de acel client
+3. scrieţi codul PL/SQL care să permită generarea fiecăreia din excepţiile următoare :
+    - NO_DATA_FOUND
+    - TOO_MANY_ROWS
+    - INVALID_NUMBER
+    - precum şi ultima alternativă, pentru toate celelalte erori.
+   
+Prin execuţii repetate, cu diferite valori, faceţi să se declanşeze secvenţele de tratare a excepţiilor. 
+
+```sql
+ACCEPT cod_client PROMPT 'Introduceti codul clientului ';
+ACCEPT cod_produs PROMPT 'Introduceti codul produsului ';
+
+DECLARE
+    cod_c client.codcli%type DEFAULT &cod_client;
+    cod_p prod.codp%type DEFAULT &cod_produs;
+    cantitate vanzare.cant%type;
+BEGIN
+     SELECT cant INTO cantitate
+     FROM vanzare
+     WHERE codcli = cod_c
+     AND codp = cod_p;
+     dbms_output.put_line('Cantitatea comparata: ' || cantitate);  
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN dbms_output.put_line ('Nu s-au gasit inregistrari') ;
+   WHEN TOO_MANY_ROWS  THEN dbms_output.put_line ('Exista mai mult de o inregistrare in tabela') ;
+   WHEN INVALID_NUMBER THEN dbms_output.put_line ('Sirul de caractere nu poate fie convertit la number') ;
+   WHEN OTHERS THEN dbms_output.put_line ('Alte erori') ;
+END;
+/
+```
+
+Rezultat:
+
+![](images/PL2_sql_E_r1.jpg)
+
+---
+
+G
+Creaţi un bloc PL/SQL pentru modificarea unui pret pentru un produs (indicat prin denumire). Controlaţi că noul pret nu este superior celui vechi; dacă da, atunci declanşaţi o excepţie.
+În acelaşi timp, prevedeţi secvenţe pentru tratarea altor excepţii: produsul nu exista (NO_DATA_FOUND), există mai multe produse cu aceeaşi denumire (TOO_MANY_ROWS).
+
+```sql 
+ACCEPT den_prod PROMPT 'Introduceti denumirea produsului ';
+ACCEPT pret_nou PROMPT 'Introduceti noul pret ';
+
+DECLARE
+	pret_vechi prod.pret%type;
+    eroare_pret_mic EXCEPTION;
+BEGIN
+    SELECT pret INTO pret_vechi
+    FROM prod
+    WHERE den LIKE '&den_prod';
+	
+    IF pret_vechi > '&pret_nou' THEN
+        RAISE eroare_pret_mic;
+	END IF;
+	
+    UPDATE prod 
+	SET pret='&pret_nou'
+    WHERE den LIKE '&den_prod';
+	
+    dbms_output.put_line('Modificare realizata');	
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN dbms_output.put_line ('Nu s-au gasit inregistrari') ;
+   WHEN TOO_MANY_ROWS  THEN dbms_output.put_line ('Exista mai mult de o inregistrare in tabela') ;
+   WHEN eroare_pret_mic THEN dbms_output.put_line ('Pretul pe care incercati sa il introducti este mai mica decat pretul vechi') ;
+   WHEN OTHERS THEN dbms_output.put_line ('Alte erori') ;
+END;
+/
+```
+
+Rezultat:
+
+![](images/PL2_sql_G_r1.jpg)
+
+![](images/PL2_sql_G_r2.jpg)
+
+![](images/PL2_sql_G_r3.jpg)
+
+---
+
+H. Creaţi o tabelă, MESSAGE, cu o singură coloană, de tip text.
+Craţi un bloc PL/SQL care citeşte o valoare de la tastatură, reprezentând un salariu, şi apoi caută în tabela emp, angajaţii cu acel salariu.
+1. dacă sunt returnate mai multe linii, să se înscrie în tabela MESSAGE textul _prea mulţi angajaţi cu salariul …_.
+2. dacă nu este returnată nicio linie, lorsque aucune ligne n'est retournée, să se înscrie în tabela MESSAGE textul _niciun angajat cu salariul …_.
+3. la apariţia unei alte erori, să se înscrie în tabela MESSAGE textul _altă eroare este prezentă; eroarea numărul … care indică …_.
+Verificaţi prin execuţii succesive, cu diferite valori.
+
+```sql
+SQL> CREATE TABLE MESSAGE
+  2  (
+  3    ERROR_TEXT VARCHAR2(200)
+  4  );
+
+Table created.
+```
+
+Continutul fisierului _**ex_h.sql**_
+```sql
+ACCEPT salariu PROMPT 'Introduceti salariul';
+DECLARE
+    emp_sal emp.sal%type;
+    eroare_cod NUMBER;
+    eroare_text VARCHAR2(50); 
+    emp_nume emp.ename%type;
+BEGIN
+    emp_sal := &salariu;
+    SELECT ename INTO emp_nume
+    FROM emp
+    WHERE sal = emp_sal;
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN 
+                            INSERT INTO message VALUES('Nici un anjajat cu salariul ' || emp_sal);
+                            dbms_output.put_line ('Nici un anjajat cu salariul ' || emp_sal) ;
+   WHEN TOO_MANY_ROWS THEN 
+                            INSERT INTO message VALUES('Prea multi angajati cu salatiul ' || emp_sal);   
+                            dbms_output.put_line ('Prea multi angajati cu salatiul ' || emp_sal);
+   WHEN OTHERS THEN 
+                    eroare_cod := SQLCODE;
+                    eroare_text := SQLERRM;
+                    INSERT INTO message VALUES('Alta eroare prezenta; Eroare numarul: ' || eroare_cod || ' ; Ea indica: ' || eroare_text);
+                    dbms_output.put_line ('Alta eroare prezenta; Eroare numarul: ' || eroare_cod || ' ; Ea indica: ' || eroare_text);
+END;
+/
+```
+
+![](images/PL2_sql_H.jpg)
+
+Rezultat:
+
+![](images/PL2_sql_H_r1.jpg)
+
+![](images/PL2_sql_H_r2.jpg)
+
+![](images/PL2_sql_H_r3.jpg)
+
+```sql
+SQL> select * from message;
+
+ERROR_TEXT
+----------------------------------------
+Nici un anjajat cu salariul 2000
+Nici un anjajat cu salariul 3500
+Prea multi angajati cu salatiul 3000
 ```
