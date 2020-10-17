@@ -260,6 +260,7 @@ Craţi un bloc PL/SQL care citeşte o valoare de la tastatură, reprezentând un
 1. dacă sunt returnate mai multe linii, să se înscrie în tabela MESSAGE textul _prea mulţi angajaţi cu salariul …_.
 2. dacă nu este returnată nicio linie, lorsque aucune ligne n'est retournée, să se înscrie în tabela MESSAGE textul _niciun angajat cu salariul …_.
 3. la apariţia unei alte erori, să se înscrie în tabela MESSAGE textul _altă eroare este prezentă; eroarea numărul … care indică …_.
+
 Verificaţi prin execuţii succesive, cu diferite valori.
 
 ```sql
