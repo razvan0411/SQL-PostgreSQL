@@ -25,15 +25,12 @@ A. Urmăriți derularea tranzacțiilor în situațiile următoare:
 | T1 | T2 |
 |--|--|
 | `select * from emp;` | `select * from emp;` |
-| `update emp
-set sal=sal*1.1;` | |
-| `insert into emp (empno, sal, deptno)
-values (3, 12000, 20);` | | 
+| `update emp set sal=sal*1.1;` | |
+| `insert into emp (empno, sal, deptno) values (3, 12000, 20);` | | 
 | `select * from emp;` | `select * from emp;` |
 | `commit;` | |
 | `select * from emp;` | `select * from emp;` |
-| `delete from emp
-where deptno=20;` | |
+| `delete from emp where deptno=20;` | |
 | `select * from emp;` | `select * from emp;` |
 | `rollback` | |
 | `select * from emp;` | `select * from emp;` |
