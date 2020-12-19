@@ -2,7 +2,7 @@
 
 ## Catalogul de sistem
 
-PostgreSQL, ca alte sisteme de gestiune a bazelor de date, oferă un colecție de tabele ion care sunt înregistrate informații despre obiectele baza de date si utilizatori.
+PostgreSQL, ca alte sisteme de gestiune a bazelor de date, oferă o colecție de tabele în care sunt înregistrate informații despre obiectele baza de date si utilizatori.
 
 ![catalog de sistem](images/system_catalog.jpg) 
 
